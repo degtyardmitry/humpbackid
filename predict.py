@@ -118,8 +118,10 @@ model, branch_model, head_model = build_model(64e-5, 0)
 model.summary()
 
 # Load the model
-if isfile('./models/standard_epoch350.h5'):
-	model.load_weights('./models/standard_epoch350.h5')
+model_path = Path(os.path.dirname(os.path.realpath(__file__))) / "models"/ "standard_epoch350.h5"
+print
+if isfile(model_path):
+	model.load_weights(model_path)
 	print('Load model success!')
 else:
 	print('The model file is not exist!')
@@ -131,7 +133,7 @@ score = head_model.predict_generator(ScoreGen(fknown, fsubmit), max_queue_size=2
 score = score_reshape(score, fknown, fsubmit)
 
 # Generate the subsmission file.
-prepare_submission(0.99, './submissions/submission.csv')
+prepare_submission(0.99, Path(os.path.dirname(os.path.realpath(__file__))) / "submission" / "submission.csv")
 toc = time.time()
 print("Submission time: %.3f minute" % (toc - tic) / 60.)
 

@@ -26,11 +26,13 @@ from imagehash import phash
 from pandas import read_csv
 from scipy.ndimage import affine_transform
 from tqdm import tqdm
+from pathlib import Path
+
 
 
 # print (os.path.abspath('.'))#获得当前工作目录
 # 源路径获取, 改成自己的工程文件所在根目录
-src_dir = "/home/harley/Program/Kaggle_Competiton/Humpback-Whale-Identification/"
+src_dir = Path(os.path.dirname(os.path.realpath(__file__))).parent
 # src_dir = os.getcwd()
 # src_dir = src_dir.replace('\\', '/');
 print(src_dir)

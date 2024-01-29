@@ -13,6 +13,8 @@ from keras import backend as K
 from scipy.ndimage import affine_transform
 from keras.utils import Sequence
 from lapjv import lapjv
+from tqdm import tqdm
+from my_utils.data_preprocess import *
 from keras.preprocessing.image import img_to_array, array_to_img
 
 # 抑制导入keras时烦人的stderr输出

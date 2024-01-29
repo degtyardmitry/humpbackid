@@ -1,9 +1,9 @@
-numpy
+numpy==1.16.1
+lapjv==1.3.1
 pandas
 scipy
 matplotlib
-tensorflow
-keras
+keras==2.2.4
 ImageHash
 kaggle
 lapjv
@@ -11,3 +11,6 @@ Pillow
 tqdm
 jupyter
 ipykernel
+tensorflow==1.9
+
+
