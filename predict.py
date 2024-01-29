@@ -100,6 +100,7 @@ def prepare_submission(threshold, filename):
 	return vtop, vhigh, pos
 
 
+
 # Find elements from training sets not 'new_whale'
 tic = time.time()
 h2ws = {}

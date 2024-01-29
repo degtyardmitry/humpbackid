@@ -30,7 +30,7 @@ from tqdm import tqdm
 
 # print (os.path.abspath('.'))#获得当前工作目录
 # 源路径获取, 改成自己的工程文件所在根目录
-src_dir = "/home/harley/Program/Kaggle_Competiton/Humpback-Whale-Identification/"
+src_dir = "/users/elmop/humpbackid/"
 # src_dir = os.getcwd()
 # src_dir = src_dir.replace('\\', '/');
 print(src_dir)
