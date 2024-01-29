@@ -1,0 +1,13 @@
+numpy
+pandas
+scipy
+matplotlib
+tensorflow
+keras
+ImageHash
+kaggle
+lapjv
+Pillow
+tqdm
+jupyter
+ipykernel
