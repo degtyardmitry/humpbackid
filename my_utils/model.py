@@ -31,7 +31,6 @@ def subblock(x, filter, **kwargs):
     return y
 
 
-# create a Siamese model function
 def build_model(lr, l2, activation='sigmoid'):
     #################################
     # BRANCH MODEL,提取输入图像的特征向量
@@ -57,36 +56,36 @@ def build_model(lr, l2, activation='sigmoid'):
 
     inp = Input(shape=img_shape)  # 384x384x1
     x = Conv2D(64, (9, 9), strides=2, activation='relu', **kwargs)(inp)
-    
+
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)  # 96x96x64
     for _ in range(2):
-    	x = BatchNormalization()(x)
-    	x = Conv2D(64, (3, 3), activation='relu', **kwargs)(x)
-    
+        x = BatchNormalization()(x)
+        x = Conv2D(64, (3, 3), activation='relu', **kwargs)(x)
+
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)  # 48x48x64
     x = BatchNormalization()(x)
     x = Conv2D(128, (1, 1), activation='relu', **kwargs)(x)  # 48x48x128
     for _ in range(4):
-    	x = subblock(x, 64, **kwargs)
-    
+        x = subblock(x, 64, **kwargs)
+
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)  # 24x24x128
     x = BatchNormalization()(x)
     x = Conv2D(256, (1, 1), activation='relu', **kwargs)(x)  # 24x24x256
     for _ in range(4):
-    	x = subblock(x, 64, **kwargs)
-    
+        x = subblock(x, 64, **kwargs)
+
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)  # 12x12x256
     x = BatchNormalization()(x)
     x = Conv2D(384, (1, 1), activation='relu', **kwargs)(x)  # 12x12x384
     for _ in range(4):
-    	x = subblock(x, 96, **kwargs)
-    
+        x = subblock(x, 96, **kwargs)
+
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)  # 6x6x384
     x = BatchNormalization()(x)
     x = Conv2D(512, (1, 1), activation='relu', **kwargs)(x)  # 6x6x512
     for _ in range(4):
-    	x = subblock(x, 128, **kwargs)
-    
+        x = subblock(x, 128, **kwargs)
+
     x = GlobalMaxPooling2D()(x)  # 512
     branch_model = Model(inp, x)
 
@@ -124,7 +123,7 @@ def build_model(lr, l2, activation='sigmoid'):
     xb = branch_model(img_b)
     x = head_model([xa, xb])
     model = Model([img_a, img_b], x)
-    
+
     model.compile(optim, loss='binary_crossentropy', metrics=['binary_crossentropy', 'acc'])
 
     return model, branch_model, head_model

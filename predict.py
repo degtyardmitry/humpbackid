@@ -2,6 +2,7 @@
 # filename: test.py
 # function: 模型测试程序,
 
+
 from my_utils.data_preprocess import *
 from my_utils.input_data import *
 from my_utils.model import *
@@ -38,6 +39,11 @@ from keras.optimizers import Adam
 from keras.preprocessing.image import img_to_array
 from keras.utils import Sequence
 from keras.models import Sequential, load_model
+
+
+os.chdir(Path(os.path.dirname(os.path.realpath(__file__))))
+
+
 
 def score_reshape(score, x, y=None):
 	"""
