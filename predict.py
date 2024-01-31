@@ -125,10 +125,10 @@ model, branch_model, head_model = build_model(64e-5, 0)
 model.summary()
 
 # Load the model
-model_path = Path(os.path.dirname(os.path.realpath(__file__))) / "models"/ "standard_epoch350.h5"
+model_path = Path(os.path.dirname(os.path.realpath(__file__))) / "model" / "standard_epoch350.h5"
 print
 if isfile(model_path):
-	model.load_weights(model_path)
+	model.load_weights(model_path, by_name=True )
 	print('Load model success!')
 else:
 	print('The model file is not exist!')

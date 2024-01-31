@@ -3,10 +3,15 @@
 # function:鲸鱼识别程序,数据输入模块
 
 from __future__ import absolute_import
+
+import os
 # from . import data_preprocess    # 导入数据预处理模块
 import sys
 import platform
 import threading
+from os.path import isfile
+from pathlib import Path
+
 import numpy as np
 import random
 from keras import backend as K
@@ -16,7 +21,32 @@ from lapjv import lapjv
 from tqdm import tqdm
 from keras.preprocessing.image import img_to_array, array_to_img
 from tqdm import tqdm
-from data_preprocess import *
+from PIL import Image as pil_image
+from .data_preprocess import *
+
+# print (os.path.abspath('.'))#获得当前工作目录
+# 源路径获取, 改成自己的工程文件所在根目录
+src_dir = Path(os.path.dirname(os.path.realpath(__file__))).parent
+# src_dir = os.getcwd()
+# src_dir = src_dir.replace('\\', '/');
+print(src_dir)
+
+TRAIN_DF = os.path.join(src_dir, "data/train.csv")
+SUB_DF = os.path.join(src_dir, "data/sample_submission.csv")
+TRAIN = os.path.join(src_dir, "data/train")
+TEST = os.path.join(src_dir, "data/test")
+P2H = os.path.join(src_dir, "data/p2h.pickle")
+P2SIZE = os.path.join(src_dir, "data/p2size.pickle")
+BB_DF = os.path.join(src_dir, "data/bounding_boxes.csv")
+
+# 把Windows下os.path.join()生成的反斜杠（\）全部替换为斜杠（/）
+TRAIN_DF = TRAIN_DF.replace('\\', '/')
+SUB_DF = SUB_DF.replace('\\', '/')
+TRAIN = TRAIN.replace('\\', '/')
+TEST = TEST.replace('\\', '/')
+P2H = P2H.replace('\\', '/')
+P2SIZE = P2SIZE.replace('\\', '/')
+BB_DF = BB_DF.replace('\\', '/')
 
 
 # 抑制导入keras时烦人的stderr输出
@@ -24,16 +54,24 @@ old_stderr = sys.stderr
 sys.stderr = open('/dev/null' if platform.system() != 'Windows' else 'nul', 'w')
 
 sys.stderr = old_stderr
-img_shape = (512, 512, 3)  # 模型使用的图像形状
+img_shape = (512, 512, 1)  # 模型使用的图像形状
 anisotropy = 2.15  # 水平压缩比
 crop_margin = 0.05  # 在边界框周围添加余量以补偿边界框的不精确性
 
+# 根据图像Id,获取文件完整路径
+def expand_path(p):
+    if isfile(os.path.join(TRAIN, p)):
+        return os.path.join(TRAIN, p)
+    if isfile(os.path.join(TEST, p)):
+        return os.path.join(TEST, p)
+    return p
 
 # -----------------------------------------------图像预处理------------------------------------------------
 # 读取指定路径图像
 def read_raw_image(p):
 	img = pil_image.open(expand_path(p))
 	return img
+
 
 
 # 图像矩阵变换函数, 返回numpy array
@@ -120,16 +158,13 @@ def read_cropped_image(p, augment):
 	offset = trans[:2, 2]
 	img_affine = affine_transform(img, matrix, offset, order=1, output_shape=img_shape[:-1], mode='constant',
 								cval=np.average(img))
-	# print('after affine_transform shape:',img_affine.shape)
-	# 将3个二维数组重叠为一个三维数组
-	rgb_array = np.zeros((img_affine.shape[0], img_affine.shape[1], 3), "float64")
-	rgb_array[:, :, 0], rgb_array[:, :, 1], rgb_array[:, :, 2] = img_affine, img_affine, img_affine
-	img = np.asarray(rgb_array, 'f')
+
+	img = np.asarray(img_affine, 'f')
 
 	# 归一化为零均值和方差
 	img -= np.mean(img, keepdims=True)
 	img /= np.std(img, keepdims=True) + K.epsilon()
-
+	img = np.expand_dims(img, axis=-1)
 	return img
 
 
@@ -291,7 +326,7 @@ class FeatureGen(Sequence):
 	# Keras生成器，仅评估branch model
 	"""
 
-	def __init__(self, data, batch_size=64, verbose=1):
+	def __init__(self, data, batch_size=10, verbose=1):
 		super(FeatureGen, self).__init__()
 		self.data = data
 		self.batch_size = batch_size
